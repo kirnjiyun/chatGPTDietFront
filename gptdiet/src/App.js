@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const AppContainer = styled.div`
     display: flex;
@@ -11,6 +13,7 @@ const AppContainer = styled.div`
     padding: 20px;
     background: linear-gradient(to bottom, #ffffff, #e7f6d5);
     color: #4a593b;
+    max-height: 100%;
     font-family: "Roboto", sans-serif;
 `;
 
@@ -69,7 +72,7 @@ const MessagesContainer = styled.div`
     max-height: 100%;
 `;
 
-const Message = styled.div`
+const MarkdownMessage = styled(ReactMarkdown)`
     background-color: ${(props) => (props.isUser ? "#cbe8a6" : "#e7f6d5")};
     color: ${(props) => (props.isUser ? "#4a593b" : "#4a593b")};
     padding: 12px;
@@ -79,6 +82,17 @@ const Message = styled.div`
     font-size: 14px;
     line-height: 1.4;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+
+    h1,
+    h2,
+    h3 {
+        color: #4a593b;
+    }
+
+    ul {
+        list-style: disc;
+        margin-left: 20px;
+    }
 `;
 
 const MessageInputContainer = styled.div`
@@ -179,9 +193,13 @@ function App() {
                     {messages
                         .filter((msg) => msg.type === chatType)
                         .map((msg, index) => (
-                            <Message key={index} isUser={msg.isUser}>
+                            <MarkdownMessage
+                                key={index}
+                                isUser={msg.isUser}
+                                remarkPlugins={[remarkGfm]}
+                            >
                                 {msg.text}
-                            </Message>
+                            </MarkdownMessage>
                         ))}
                 </MessagesContainer>
             </ChatWindow>
