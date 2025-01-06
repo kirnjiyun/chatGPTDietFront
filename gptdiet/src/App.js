@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 const AppContainer = styled.div`
     display: flex;
@@ -55,7 +56,7 @@ const ChatWindow = styled.div`
     margin: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     overflow-y: auto;
-    max-height: 600px;
+    min-height: 300px;
 `;
 
 const MessagesContainer = styled.div`
@@ -126,25 +127,34 @@ function App() {
     const [chatType, setChatType] = useState("diet"); // diet or exercise
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+    const sendMessageToBackend = async (message, type) => {
+        try {
+            console.log("Sending to backend:", { message, type }); // 디버깅용 로그
+            const response = await axios.post("http://localhost:5000/chat", {
+                message,
+                type,
+            });
+            return response.data.content;
+        } catch (error) {
+            console.error("Error communicating with backend:", error);
+            return "오류가 발생했습니다. 다시 시도해주세요.";
+        }
+    };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (input.trim()) {
-            setMessages([
-                ...messages,
-                { text: input, isUser: true, type: chatType },
-            ]);
+            const userMessage = { text: input, isUser: true, type: chatType };
+            setMessages([...messages, userMessage]);
             setInput("");
 
-            const response =
-                chatType === "diet"
-                    ? "여기 식단 추천이 있습니다! 🥗"
-                    : "여기 운동 추천이 있습니다! 💪";
-            setTimeout(() => {
-                setMessages((prev) => [
-                    ...prev,
-                    { text: response, isUser: false, type: chatType },
-                ]);
-            }, 500);
+            const response = await sendMessageToBackend(input, chatType);
+
+            const gptMessage = {
+                text: response,
+                isUser: false,
+                type: chatType,
+            };
+            setMessages((prev) => [...prev, gptMessage]);
         }
     };
 
