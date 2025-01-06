@@ -120,6 +120,23 @@ const Input = styled.input`
         border-color: #b5d68d;
     }
 `;
+const Spinner = styled.div`
+    border: 4px solid #e7f6d5;
+    border-top: 4px solid #cbe8a6;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+`;
 
 const SendButton = styled.button`
     background-color: #cbe8a6;
@@ -141,6 +158,7 @@ function App() {
     const [chatType, setChatType] = useState("diet"); // 식단 추천 또는 운동 추천
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const sendMessageToBackend = async (message, type) => {
         try {
@@ -152,6 +170,8 @@ function App() {
         } catch (error) {
             console.error("Error communicating with backend:", error);
             return "오류가 발생했습니다. 다시 시도해주세요.";
+        } finally {
+            setLoading(false); // 로딩 종료
         }
     };
 
@@ -160,7 +180,7 @@ function App() {
             const userMessage = { text: input, isUser: true, type: chatType };
             setMessages((prev) => [...prev, userMessage]);
             setInput("");
-
+            setLoading(true);
             const response = await sendMessageToBackend(input, chatType);
             const gptMessage = {
                 text: response,
@@ -201,6 +221,11 @@ function App() {
                                 {msg.text}
                             </MarkdownMessage>
                         ))}
+                    {loading && (
+                        <div style={{ alignSelf: "center", margin: "10px 0" }}>
+                            <Spinner />
+                        </div>
+                    )}
                 </MessagesContainer>
             </ChatWindow>
 
