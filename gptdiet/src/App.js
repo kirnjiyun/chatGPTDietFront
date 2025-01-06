@@ -124,12 +124,12 @@ const SendButton = styled.button`
 `;
 
 function App() {
-    const [chatType, setChatType] = useState("diet"); // diet or exercise
+    const [chatType, setChatType] = useState("diet"); // 식단 추천 또는 운동 추천
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+
     const sendMessageToBackend = async (message, type) => {
         try {
-            console.log("Sending to backend:", { message, type }); // 디버깅용 로그
             const response = await axios.post("http://localhost:5000/chat", {
                 message,
                 type,
@@ -144,11 +144,10 @@ function App() {
     const handleSendMessage = async () => {
         if (input.trim()) {
             const userMessage = { text: input, isUser: true, type: chatType };
-            setMessages([...messages, userMessage]);
+            setMessages((prev) => [...prev, userMessage]);
             setInput("");
 
             const response = await sendMessageToBackend(input, chatType);
-
             const gptMessage = {
                 text: response,
                 isUser: false,
@@ -192,6 +191,12 @@ function App() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="메시지를 입력하세요..."
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleSendMessage();
+                        }
+                    }}
                 />
                 <SendButton onClick={handleSendMessage}>보내기</SendButton>
             </MessageInputContainer>
