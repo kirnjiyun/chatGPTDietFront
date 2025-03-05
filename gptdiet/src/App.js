@@ -11,7 +11,7 @@ const AppContainer = styled.div`
     justify-content: space-between;
     height: 100vh;
     padding: 20px;
-    background: linear-gradient(to bottom, #ffffff, #e7f6d5);
+    background: linear-gradient(to top, #ffffff, #e7f6d5);
     color: #4a593b;
     max-height: 100%;
     font-family: "Roboto", sans-serif;
